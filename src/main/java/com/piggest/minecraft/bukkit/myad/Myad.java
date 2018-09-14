@@ -10,11 +10,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import net.milkbowl.vault.economy.Economy;
 
 public class Myad extends JavaPlugin {
-	private boolean use_vault = true;
 	private Economy economy = null;
 
 	private FileConfiguration config = null;
-
+	private Ad_publisher publisher = null;
+	
 	private boolean initVault() {
 		boolean hasNull = false;
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
@@ -26,24 +26,29 @@ public class Myad extends JavaPlugin {
 		}
 		return !hasNull;
 	}
-
+	public Ad_publisher get_publisher(){
+		return this.publisher;
+	}
+	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
 		config = getConfig();
-		use_vault = config.getBoolean("use-vault");
-		if (use_vault == true) {
-			getLogger().info("使用Vault");
-			if (!initVault()) {
-				getLogger().severe("初始化Vault失败,请检测是否已经安装Vault插件和经济插件");
-				return;
-			}
-		} else {
-			getLogger().info("不使用Vault");
+		if (!initVault()) {
+			getLogger().severe("初始化Vault失败,请检测是否已经安装Vault插件和经济插件");
+			return;
 		}
-
+		getLogger().info("启动广告发布器");
+		this.publisher = new Ad_publisher(this);
+		this.publisher.start();
 	}
-
+	
+	@Override
+	public void onDisable(){
+		getLogger().info("停止广告发布器");
+		publisher.stop();
+	}
+	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		int cycle = 1;
@@ -74,7 +79,12 @@ public class Myad extends JavaPlugin {
 							return true;
 						}
 					}
-					
+					Ad ad = new Ad(this);
+					ad.set_player_name(sender.getName());
+					ad.set_contents(args[3]);
+					ad.set_cycle(cycle);
+					ad.start();
+					this.publisher.add_ad(ad);
 					sender.sendMessage("广告申请成功");
 				} else {
 					sender.sendMessage("你没有权限申请广告");
