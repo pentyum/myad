@@ -20,16 +20,32 @@ public class Ad implements Runnable {
 		this.player_name = player_name;
 	}
 
+	public String get_player_name() {
+		return this.player_name;
+	}
+
 	public void set_contents(String contents) {
 		this.contents = contents;
+	}
+
+	public String get_contents() {
+		return this.contents;
 	}
 
 	public void set_cycle(int cycle) {
 		this.cycle = cycle;
 	}
 
+	public int get_cycle() {
+		return this.cycle;
+	}
+
 	public void set_last_times(int times) {
 		this.last_times = times;
+	}
+
+	public int get_last_times() {
+		return this.last_times;
 	}
 
 	public static int parse_cycle(String cycle_string) {

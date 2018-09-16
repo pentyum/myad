@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.MemoryConfiguration;
 
 public class Ad_publisher {
 	private HashSet<Ad> ad_set;
@@ -26,6 +27,7 @@ public class Ad_publisher {
 		for (Ad ad : ad_set) {
 			ad.stop();
 		}
+		save_ads();
 	}
 	
 	public void load_ads(ConfigurationSection ads) {
@@ -39,6 +41,19 @@ public class Ad_publisher {
 			ad.set_contents(ad_config.getString("contents"));
 			this.ad_set.add(ad);
 		}
+	}
+	
+	public void save_ads() {
+		MemoryConfiguration ads = new MemoryConfiguration();
+		for(Ad ad:ad_set) {
+			MemoryConfiguration ad_config = new MemoryConfiguration();
+			ad_config.set("cycle", ad.get_cycle());
+			ad_config.set("last_times", ad.get_last_times());
+			ad_config.set("contents", ad.get_contents());
+			ads.set(ad.get_player_name(), ad_config);
+		}
+		myad.getConfig().set("ads", ads);
+		myad.saveConfig();
 	}
 	
 	public void start() {
