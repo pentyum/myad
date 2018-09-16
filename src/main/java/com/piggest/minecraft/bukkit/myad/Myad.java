@@ -2,6 +2,7 @@ package com.piggest.minecraft.bukkit.myad;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -13,6 +14,7 @@ public class Myad extends JavaPlugin {
 	private Economy economy = null;
 
 	private FileConfiguration config = null;
+	private int price = 0;
 	private Ad_publisher publisher = null;
 	
 	private boolean initVault() {
@@ -30,6 +32,18 @@ public class Myad extends JavaPlugin {
 		return this.publisher;
 	}
 	
+	public int get_price() {
+		return this.price;
+	}
+	
+	public ConfigurationSection get_ads() {
+		return this.config.getConfigurationSection("ads");
+	}
+	
+	public void save() {
+		
+	}
+	
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
@@ -38,8 +52,10 @@ public class Myad extends JavaPlugin {
 			getLogger().severe("初始化Vault失败,请检测是否已经安装Vault插件和经济插件");
 			return;
 		}
+		this.price=config.getInt("price");
 		getLogger().info("启动广告发布器");
 		this.publisher = new Ad_publisher(this);
+		this.publisher.load_ads(this.get_ads());
 		this.publisher.start();
 	}
 	
@@ -53,7 +69,6 @@ public class Myad extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		int cycle = 1;
 		int times = 1;
-		int base_price = 100;
 		int total_price = 0;
 		if (cmd.getName().equalsIgnoreCase("myad")) {
 			if (args[0].equalsIgnoreCase("apply")) { // 申请广告
@@ -68,7 +83,7 @@ public class Myad extends JavaPlugin {
 						sender.sendMessage("周期格式不正确");
 						return true;
 					}
-					total_price = base_price*times;
+					total_price = this.price*times;
 					if (!sender.hasPermission("myad.free")){
 						Player player = (Player)sender;
 						if (economy.has(player, total_price)) {
@@ -79,10 +94,11 @@ public class Myad extends JavaPlugin {
 							return true;
 						}
 					}
-					Ad ad = new Ad(this);
+					Ad ad = new Ad(this.publisher);
 					ad.set_player_name(sender.getName());
 					ad.set_contents(args[3]);
 					ad.set_cycle(cycle);
+					ad.set_last_times(times);
 					ad.start();
 					this.publisher.add_ad(ad);
 					sender.sendMessage("广告申请成功");

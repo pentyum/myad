@@ -5,14 +5,15 @@ public class Ad implements Runnable {
 	private String contents;
 	private int cycle;
 	private Thread ad_thread = null;
-	private Myad myad = null;
+	private int last_times = 0;
+	private Ad_publisher publisher = null;
 
-	public Ad(Myad myad) {
-		this.myad = myad;
+	public Ad(Ad_publisher publisher) {
+		this.publisher = publisher;
 	}
 
 	public Ad_publisher get_publisher() {
-		return this.myad.get_publisher();
+		return this.publisher;
 	}
 
 	public void set_player_name(String player_name) {
@@ -25,6 +26,10 @@ public class Ad implements Runnable {
 
 	public void set_cycle(int cycle) {
 		this.cycle = cycle;
+	}
+
+	public void set_last_times(int times) {
+		this.last_times = times;
 	}
 
 	public static int parse_cycle(String cycle_string) {
@@ -48,12 +53,18 @@ public class Ad implements Runnable {
 	public void run() {
 		try {
 			while (true) {
+				if (this.last_times <= 0) {
+					break;
+				}
 				this.publish();
+				this.last_times--;
 				Thread.sleep(1000 * cycle);
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		publisher.get_plugin().getLogger().info("广告次数已经用尽");
+		publisher.get_plugin().getLogger().info("停止广告发布线程");
 	}
 
 	public void publish() {
@@ -62,15 +73,14 @@ public class Ad implements Runnable {
 
 	public void start() {
 		if (ad_thread == null) {
-			myad.getLogger().info("启动广告发布线程");
+			publisher.get_plugin().getLogger().info("启动广告发布线程");
 			ad_thread = new Thread(this);
 			ad_thread.start();
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public void stop() {
-		myad.getLogger().info("停止广告发布线程");
-		ad_thread.stop();
+		publisher.get_plugin().getLogger().info("停止广告发布线程");
+		ad_thread.interrupt();
 	}
 }

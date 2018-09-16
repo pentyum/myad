@@ -1,6 +1,10 @@
-use-vault: true
-price: 
-  world: 100
-  world_nether: 200
-  world_the_end: 100
-  other: 100
+price: 10
+ads:
+  Pentyum:
+    contents: 你好我是Pentyum
+    cycle: 60
+    last_times: 10
+  Pentium:
+    contents: 你好我是Pentium
+    cycle: 30
+    last_times: 20
