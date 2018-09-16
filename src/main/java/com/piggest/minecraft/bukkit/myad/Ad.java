@@ -69,34 +69,43 @@ public class Ad implements Runnable {
 	public void run() {
 		try {
 			while (true) {
+				Thread.sleep(1000 * cycle);
 				if (this.last_times <= 0) {
+					publisher.get_plugin().getLogger().info(this.player_name + "的广告次数已经用尽");
 					break;
 				}
-				this.publish();
 				this.last_times--;
-				Thread.sleep(1000 * cycle);
+				this.publish();
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			publisher.get_plugin().getLogger().info(this.player_name + "的广告发布线程已被停止");
 		}
-		publisher.get_plugin().getLogger().info("广告次数已经用尽");
-		publisher.get_plugin().getLogger().info("停止广告发布线程");
+		publisher.get_plugin().getLogger().info(this.player_name + "的广告发布线程结束");
 	}
 
 	public void publish() {
-		this.get_publisher().publish("[AD:" + this.player_name + "] " + this.contents);
+		publisher.publish("[AD:" + this.player_name + "] " + this.contents);
+		publisher.get_plugin().getLogger().info(this.player_name + "的广告还剩余" + this.last_times + "次");
 	}
 
 	public void start() {
+		if (this.last_times <= 0) {
+			publisher.get_plugin().getLogger().info(this.player_name + "的广告次数已耗尽，因此广告发布线程不会启动");
+			return;
+		}
 		if (ad_thread == null) {
-			publisher.get_plugin().getLogger().info("启动广告发布线程");
+			publisher.get_plugin().getLogger().info("启动" + this.player_name + "的广告发布线程");
 			ad_thread = new Thread(this);
 			ad_thread.start();
 		}
 	}
 
 	public void stop() {
-		publisher.get_plugin().getLogger().info("停止广告发布线程");
-		ad_thread.interrupt();
+		if (ad_thread != null) {
+			publisher.get_plugin().getLogger().info("停止" + this.player_name + "的广告发布线程");
+			ad_thread.interrupt();
+		} else {
+			publisher.get_plugin().getLogger().info(this.player_name + "的广告发布线程并没有在运行");
+		}
 	}
 }

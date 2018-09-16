@@ -22,4 +22,10 @@ permissions:
   myad.free:
     description: free ad
     default: op
+  myad.modify:
+    description: modify applied ad
+    default: true
+  myad.info:
+    description: list all ad info
+    default: op
 softdepend: [Vault]
