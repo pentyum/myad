@@ -6,7 +6,7 @@ author: Pentyum
 commands:
   myad:
     description: myad
-    usage: /<command> apply <cycle(h)> <times> <contents> to apply ad.
+    usage: /<command> apply <cycle[h|m]> <times> <contents> to apply ad.
     permission: myad.apply
     permission-message: You don't have permission
 permissions:

@@ -41,8 +41,20 @@ public class Myad extends JavaPlugin {
 		return this.config.getConfigurationSection("ads");
 	}
 
-	public void save() {
-
+	public boolean check_out(CommandSender sender, int times) {
+		if (!sender.hasPermission("myad.free")) {
+			int total_price = this.price * times;
+			Player player = (Player) sender;
+			if (economy.has(player, total_price)) {
+				economy.withdrawPlayer(player, total_price);
+				player.sendMessage("已扣除" + total_price);
+				return true;
+			} else {
+				player.sendMessage("你的金钱不够");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -70,10 +82,17 @@ public class Myad extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
 		int cycle = 1;
 		int times = 1;
-		int total_price = 0;
 		if (cmd.getName().equalsIgnoreCase("myad")) {
+			if (args.length == 0) {
+				sender.sendMessage("/myad apply|cycle|contents|extend");
+				return true;
+			}
 			if (args[0].equalsIgnoreCase("apply")) { // 申请广告
 				if (sender.hasPermission("myad.apply")) {
+					if (args.length != 4) {
+						sender.sendMessage("/myad apply <周期[h|m]> <次数> <内容>");
+						return true;
+					}
 					try {
 						times = Integer.parseInt(args[2]);
 					} catch (Exception e) {
@@ -84,24 +103,16 @@ public class Myad extends JavaPlugin {
 						sender.sendMessage("周期格式不正确");
 						return true;
 					}
-					total_price = this.price * times;
-					if (!sender.hasPermission("myad.free")) {
-						Player player = (Player) sender;
-						if (economy.has(player, total_price)) {
-							economy.withdrawPlayer(player, total_price);
-							player.sendMessage("已扣除" + total_price);
-						} else {
-							player.sendMessage("你的金钱不够");
-							return true;
-						}
+					if (check_out(sender, times) == false) {
+						return true;
 					}
 					Ad ad = new Ad(this.publisher);
 					ad.set_player_name(sender.getName());
-					ad.set_contents(args[3]);
-					ad.set_cycle(cycle);
-					ad.set_last_times(times);
-					ad.start();
 					if (this.publisher.add_ad(ad)) {
+						ad.set_contents(args[3]);
+						ad.set_cycle(cycle);
+						ad.set_last_times(times);
+						ad.start();
 						sender.sendMessage("广告申请成功");
 					} else {
 						sender.sendMessage(
@@ -112,6 +123,10 @@ public class Myad extends JavaPlugin {
 				}
 				return true;
 			} else if (args[0].equalsIgnoreCase("cycle")) {
+				if (args.length != 2) {
+					sender.sendMessage("/myad cycle <周期[h|m]>");
+					return true;
+				}
 				if (sender.hasPermission("myad.modify")) {
 					if ((cycle = Ad.parse_cycle(args[1])) == 0) {
 						sender.sendMessage("周期格式不正确");
@@ -129,6 +144,10 @@ public class Myad extends JavaPlugin {
 				}
 				return true;
 			} else if (args[0].equalsIgnoreCase("contents")) {
+				if (args.length != 2) {
+					sender.sendMessage("/myad contents <内容>");
+					return true;
+				}
 				if (sender.hasPermission("myad.modify")) {
 					Ad ad = publisher.get_ad_by_player_name(sender.getName());
 					if (ad == null) {
@@ -142,6 +161,10 @@ public class Myad extends JavaPlugin {
 				}
 				return true;
 			} else if (args[0].equalsIgnoreCase("extend")) {
+				if (args.length != 2) {
+					sender.sendMessage("/myad extend <次数>");
+					return true;
+				}
 				if (sender.hasPermission("myad.modify")) {
 					try {
 						times = Integer.parseInt(args[1]);
@@ -152,6 +175,9 @@ public class Myad extends JavaPlugin {
 					Ad ad = publisher.get_ad_by_player_name(sender.getName());
 					if (ad == null) {
 						sender.sendMessage("你还没有发布广告");
+						return true;
+					}
+					if (check_out(sender, times) == false) {
 						return true;
 					}
 					int current_last_times = ad.get_last_times();
