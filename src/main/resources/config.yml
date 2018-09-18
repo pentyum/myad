@@ -1,10 +1,6 @@
 price: 10
 ads:
   Pentyum:
-    contents: 你好我是Pentyum
+    contents: 欢迎使用Myad广告插件
     cycle: 60
-    last_times: 10
-  Pentium:
-    contents: 你好我是Pentium
-    cycle: 30
-    last_times: 20
+    last_times: 1000
