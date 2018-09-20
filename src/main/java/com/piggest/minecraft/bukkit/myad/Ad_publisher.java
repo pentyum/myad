@@ -62,7 +62,7 @@ public class Ad_publisher extends Myad_component {
 	public String get_all_info() {
 		String info = "查看所有广告信息";
 		for (Ad ad : ad_set) {
-			info += "\n";
+			info += "\n----------------\n";
 			info += ad.toString();
 		}
 		return info;

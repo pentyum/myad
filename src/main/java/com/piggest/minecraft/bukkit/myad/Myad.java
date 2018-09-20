@@ -17,7 +17,7 @@ public class Myad extends JavaPlugin {
 	private int price = 0;
 	private Ad_publisher publisher = null;
 	private Language lang = null;
-	
+
 	private boolean initVault() {
 		boolean hasNull = false;
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
@@ -90,13 +90,9 @@ public class Myad extends JavaPlugin {
 		int cycle = 1;
 		int times = 1;
 		if (cmd.getName().equalsIgnoreCase("myad")) {
-			if (args.length == 0) {
-				sender.sendMessage("/myad apply|cycle|contents|extend");
-				return true;
-			}
-			Action action = Action.parse_action(args[0]);
+			Action action = Action.parse_action(args);
 			if (action == null) {
-				sender.sendMessage("/myad apply|cycle|contents|extend");
+				sender.sendMessage("/myad apply|cycle|contents|extend|info");
 				return true;
 			} else if (action == Action.apply) { // 申请广告
 				if (sender.hasPermission("myad.apply")) {

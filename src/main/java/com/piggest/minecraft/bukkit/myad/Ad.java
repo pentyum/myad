@@ -47,11 +47,13 @@ public class Ad implements Runnable {
 	public int get_last_times() {
 		return this.last_times;
 	}
+
 	@Override
 	public String toString() {
-		return this.get_player_name()+"的广告信息" + "\n内容: " + this.get_contents() + "\n周期: " + this.get_cycle() + "s\n剩余次数: "
-				+ this.get_last_times();
+		return this.get_player_name() + "的广告信息" + "\n内容: " + this.get_contents() + "\n周期: " + this.get_cycle()
+				+ "s\n剩余次数: " + this.get_last_times();
 	}
+
 	public static int parse_cycle(String cycle_string) {
 		int length = cycle_string.length();
 		String number = cycle_string.substring(0, length - 1);
