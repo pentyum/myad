@@ -1,7 +1,7 @@
 name: myad
 main: com.piggest.minecraft.bukkit.myad.Myad
 api-version: 1.13
-version: 0.0.1
+version: 0.1.0
 author: Pentyum
 commands:
   myad:
@@ -26,6 +26,12 @@ permissions:
     description: modify applied ad
     default: true
   myad.info:
-    description: list all ad info
+    description: look up my ad info
+    default: true
+  myad.info.others:
+    description: look up others ad info
+    default: op
+  myad.list:
+    description: list ad info
     default: op
 softdepend: [Vault]

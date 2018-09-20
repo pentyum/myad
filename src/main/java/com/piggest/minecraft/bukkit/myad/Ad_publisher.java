@@ -6,16 +6,11 @@ import java.util.Set;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
-public class Ad_publisher {
+public class Ad_publisher extends Myad_component {
 	private HashSet<Ad> ad_set;
-	private Myad myad = null;
-
-	public Myad get_plugin() {
-		return this.myad;
-	}
 
 	public Ad_publisher(Myad myad) {
-		this.myad = myad;
+		super(myad);
 		this.ad_set = new HashSet<Ad>();
 	}
 
@@ -62,6 +57,15 @@ public class Ad_publisher {
 		for (Ad ad : ad_set) {
 			ad.start();
 		}
+	}
+
+	public String get_all_info() {
+		String info = "查看所有广告信息";
+		for (Ad ad : ad_set) {
+			info += "\n";
+			info += ad.toString();
+		}
+		return info;
 	}
 
 	public Ad get_ad_by_player_name(String player_name) {

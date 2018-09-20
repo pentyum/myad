@@ -4,3 +4,12 @@ ads:
     contents: 欢迎使用Myad广告插件
     cycle: 60
     last_times: 1000
+language:
+  times_format_error: 次数必须是整数
+  cycle_format_error: 周期格式错误
+  ad_apply_success: 广告申请成功
+  modity_contents_success: 广告内容修改成功
+  modity_cycle_success: 广告周期修改成功
+  extend_times_success: 广告次数延长成功
+  ad_not_found: 你还没有发布广告
+  

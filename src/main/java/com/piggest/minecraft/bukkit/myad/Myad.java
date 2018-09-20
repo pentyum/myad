@@ -16,7 +16,8 @@ public class Myad extends JavaPlugin {
 	private FileConfiguration config = null;
 	private int price = 0;
 	private Ad_publisher publisher = null;
-
+	private Language lang = null;
+	
 	private boolean initVault() {
 		boolean hasNull = false;
 		RegisteredServiceProvider<Economy> economyProvider = getServer().getServicesManager()
@@ -41,6 +42,10 @@ public class Myad extends JavaPlugin {
 		return this.config.getConfigurationSection("ads");
 	}
 
+	public ConfigurationSection get_lang_config() {
+		return this.config.getConfigurationSection("language");
+	}
+
 	public boolean check_out(CommandSender sender, int times) {
 		if (!sender.hasPermission("myad.free")) {
 			int total_price = this.price * times;
@@ -61,6 +66,8 @@ public class Myad extends JavaPlugin {
 	public void onEnable() {
 		saveDefaultConfig();
 		config = getConfig();
+		this.lang = new Language(this);
+		this.lang.load_language(this.get_lang_config());
 		if (!initVault()) {
 			getLogger().severe("初始化Vault失败,请检测是否已经安装Vault插件和经济插件");
 			return;
@@ -87,7 +94,11 @@ public class Myad extends JavaPlugin {
 				sender.sendMessage("/myad apply|cycle|contents|extend");
 				return true;
 			}
-			if (args[0].equalsIgnoreCase("apply")) { // 申请广告
+			Action action = Action.parse_action(args[0]);
+			if (action == null) {
+				sender.sendMessage("/myad apply|cycle|contents|extend");
+				return true;
+			} else if (action == Action.apply) { // 申请广告
 				if (sender.hasPermission("myad.apply")) {
 					if (args.length != 4) {
 						sender.sendMessage("/myad apply <周期[h|m]> <次数> <内容>");
@@ -121,8 +132,7 @@ public class Myad extends JavaPlugin {
 				} else {
 					sender.sendMessage("你没有权限申请广告");
 				}
-				return true;
-			} else if (args[0].equalsIgnoreCase("cycle")) {
+			} else if (action == Action.cycle) {
 				if (args.length != 2) {
 					sender.sendMessage("/myad cycle <周期[h|m]>");
 					return true;
@@ -142,8 +152,7 @@ public class Myad extends JavaPlugin {
 				} else {
 					sender.sendMessage("你没有权限修改广告");
 				}
-				return true;
-			} else if (args[0].equalsIgnoreCase("contents")) {
+			} else if (action == Action.contents) {
 				if (args.length != 2) {
 					sender.sendMessage("/myad contents <内容>");
 					return true;
@@ -159,8 +168,7 @@ public class Myad extends JavaPlugin {
 				} else {
 					sender.sendMessage("你没有权限修改广告");
 				}
-				return true;
-			} else if (args[0].equalsIgnoreCase("extend")) {
+			} else if (action == Action.extend) {
 				if (args.length != 2) {
 					sender.sendMessage("/myad extend <次数>");
 					return true;
@@ -190,15 +198,34 @@ public class Myad extends JavaPlugin {
 				} else {
 					sender.sendMessage("你没有权限修改广告");
 				}
-				return true;
-			} else if (args[0].equalsIgnoreCase("info")) {
+			} else if (action == Action.info) {
 				if (sender.hasPermission("myad.info")) {
-
+					if (args.length == 1) {
+						Ad ad = publisher.get_ad_by_player_name(sender.getName());
+						sender.sendMessage(ad.toString());
+					} else {
+						if (sender.hasPermission("myad.info.others")) {
+							Ad ad = publisher.get_ad_by_player_name(args[1]);
+							if (ad != null) {
+								sender.sendMessage(ad.toString());
+							} else {
+								sender.sendMessage("该玩家没有发布广告");
+							}
+						} else {
+							sender.sendMessage("你没有权限查看别人的广告信息");
+						}
+					}
+				} else {
+					sender.sendMessage("你没有权限查看广告信息");
+				}
+			} else if (action == Action.list) {
+				if (sender.hasPermission("myad.list")) {
+					sender.sendMessage(publisher.get_all_info());
 				} else {
 					sender.sendMessage("你没有权限查看广告列表");
 				}
-				return true;
 			}
+			return true;
 		}
 		return false;
 	}
