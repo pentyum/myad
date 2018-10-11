@@ -198,7 +198,11 @@ public class Myad extends JavaPlugin {
 				if (sender.hasPermission("myad.info")) {
 					if (args.length == 1) {
 						Ad ad = publisher.get_ad_by_player_name(sender.getName());
-						sender.sendMessage(ad.toString());
+						if (ad != null) {
+							sender.sendMessage(ad.toString());
+						}else{
+							sender.sendMessage("你还没有发布广告，请输入/myad apply <周期[h|m]> <次数> <内容>发布");
+						}
 					} else {
 						if (sender.hasPermission("myad.info.others")) {
 							Ad ad = publisher.get_ad_by_player_name(args[1]);
